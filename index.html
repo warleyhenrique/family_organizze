@@ -1,3 +1,60 @@
+<script>
+(() => {
+	const iconPaths = {
+		'Início': '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+		'Agenda': '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+		'Documentos': '<path d="M6 3h9l3 3v15H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v4h4M8 12h6M8 16h6"/>',
+		'Saúde': '<path d="M20.8 8.6c0 5.4-8.8 10.4-8.8 10.4S3.2 14 3.2 8.6A4.6 4.6 0 0 1 12 6.4a4.6 4.6 0 0 1 8.8 2.2z"/>',
+		'Aniversários': '<circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0M12 2v2M4 4l2 2M20 4l-2 2"/>',
+		'Receitas': '<path d="M6 3h12v18H6z"/><path d="M9 7h6M9 11h6M9 15h4"/>',
+		'Tarefas': '<path d="m5 12 4 4L19 6"/><circle cx="12" cy="12" r="9"/>',
+		'Compras': '<path d="M4 5h17l-2 9H7L5 3H2M9 19a1 1 0 1 1-2 0M18 19a1 1 0 1 1-2 0"/>',
+		'Memórias': '<rect x="3" y="4" width="18" height="17" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="m4 18 5-5 3 3 2-2 5 4"/>',
+		'Perfis': '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'
+	};
+	const style = document.createElement('style');
+	style.textContent = `.app{transition:grid-template-columns .2s ease}.app.sidebar-collapsed{grid-template-columns:76px 1fr}.side{overflow:hidden}.brand{display:flex;align-items:center;gap:10px;white-space:nowrap}.brand b{display:grid;place-items:center;flex:0 0 31px}.brand span{overflow:hidden}.nav button{display:flex;align-items:center;gap:11px;width:100%;white-space:nowrap}.nav-icon{display:grid;place-items:center;flex:0 0 20px}.nav-icon svg,.sidebar-toggle svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.nav-label{overflow:hidden}.sidebar-toggle{margin:20px 0 0;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:9px;width:100%;height:38px;display:flex;align-items:center;justify-content:center;gap:8px}.sidebar-toggle:hover{color:var(--brand);background:var(--soft)}.app.sidebar-collapsed .brand{justify-content:center}.app.sidebar-collapsed .brand span,.app.sidebar-collapsed .nav-label,.app.sidebar-collapsed #profile,.app.sidebar-collapsed .sidebar-toggle span{display:none}.app.sidebar-collapsed .nav button{justify-content:center;padding-left:10px;padding-right:10px}.app.sidebar-collapsed .sidebar-toggle{margin-left:auto;margin-right:auto;width:38px}@media(max-width:760px){.app.sidebar-collapsed{display:block}.app.sidebar-collapsed .side{padding:13px}.app.sidebar-collapsed .brand{justify-content:flex-start}.app.sidebar-collapsed .brand span,.app.sidebar-collapsed .nav-label{display:inline}.app.sidebar-collapsed .nav button{justify-content:flex-start;padding:8px}.app.sidebar-collapsed .sidebar-toggle{width:100%;margin-left:0;margin-right:0}}`;
+	document.head.appendChild(style);
+
+	function updateToggle() {
+		const app = document.querySelector('#app');
+		const side = document.querySelector('.side');
+		if (!app || !side) return;
+		let toggle = document.querySelector('#sidebar-toggle');
+		if (!toggle) {
+			toggle = document.createElement('button');
+			toggle.id = 'sidebar-toggle';
+			toggle.type = 'button';
+			toggle.className = 'sidebar-toggle';
+			side.appendChild(toggle);
+		}
+		const collapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+		app.classList.toggle('sidebar-collapsed', collapsed);
+		const toggleContent = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg><span>${collapsed ? 'Expandir menu' : 'Recolher menu'}</span>`;
+		if (toggle.innerHTML !== toggleContent) toggle.innerHTML = toggleContent;
+		toggle.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu');
+		toggle.title = collapsed ? 'Expandir menu' : 'Recolher menu';
+		toggle.onclick = () => {
+			localStorage.setItem('sidebar-collapsed', String(!collapsed));
+			updateToggle();
+		};
+	}
+
+	function updateIcons() {
+		document.querySelectorAll('#nav button').forEach(button => {
+			const label = button.textContent.trim().replace(/^\S+\s+/, '');
+			if (!iconPaths[label]) return;
+			if (button.querySelector('.nav-icon')) return;
+			button.innerHTML = `<span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[label]}</svg></span><span class="nav-label">${label}</span>`;
+			button.title = label;
+		});
+		updateToggle();
+	}
+
+	new MutationObserver(updateIcons).observe(document.body, { childList: true, subtree: true });
+	updateIcons();
+})();
+</script>
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lar em Ordem</title><style>
 :root{--bg:#f6f7f3;--surface:#fff;--ink:#20251f;--muted:#687167;--line:#e3e7df;--brand:#39694a;--soft:#edf5ed;--danger:#a03a32;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg)}*{box-sizing:border-box}body{margin:0}button,input,textarea,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}.app{min-height:100vh;display:grid;grid-template-columns:230px 1fr}.side{background:var(--surface);border-right:1px solid var(--line);padding:26px 15px}.brand{font-weight:750;font-size:17px;margin:0 10px 28px}.brand b{display:inline-grid;place-items:center;width:31px;height:31px;background:var(--brand);color:#fff;border-radius:10px;margin-right:9px}.nav{display:grid;gap:4px}.nav button{border:0;background:transparent;color:var(--muted);padding:10px 12px;text-align:left;border-radius:9px;font-weight:600}.nav button.active,.nav button:hover{color:var(--brand);background:var(--soft)}main{max-width:1170px;width:100%;margin:auto;padding:34px 42px}.top,.toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:24px}h1{margin:0 0 6px;font-size:27px;letter-spacing:-.04em}h2{font-size:15px;margin:0}.sub{margin:0;color:var(--muted)}.primary,.secondary{border-radius:9px;padding:10px 14px;font-weight:650}.primary{background:var(--brand);color:#fff;border:0}.secondary{background:var(--surface);color:var(--ink);border:1px solid var(--line)}.grid{display:grid;grid-template-columns:1.2fr .9fr;gap:18px}.panel,.card{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:0 10px 28px #2030200c}.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.link{background:transparent;border:0;color:var(--brand);font-size:13px;font-weight:650}.row{display:grid;grid-template-columns:66px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}.row:first-of-type{border-top:0}.time{color:var(--brand);font-size:13px;font-weight:700}.name{font-size:14px;font-weight:650}.detail{display:block;margin-top:3px;color:var(--muted);font-size:12px}.tag{font-size:11px;color:var(--brand);background:var(--soft);padding:5px 8px;border-radius:20px}.minis,.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:17px;margin-top:18px}.mini{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:17px}.mini i{color:var(--brand);font-style:normal;font-size:18px}.mini h3{font-size:13px;margin:11px 0 5px}.mini p{font-size:12px;line-height:1.45;color:var(--muted);margin:0}.cards{margin-top:0}.card h3{font-size:15px;margin:0 0 12px}.table{border-collapse:collapse;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:15px;overflow:hidden;box-shadow:0 10px 28px #2030200c}.table th,.table td{padding:13px 15px;text-align:left;border-bottom:1px solid var(--line);font-size:13px}.table th{font-size:11px;color:var(--muted);text-transform:uppercase}.table tr:last-child td{border:0}.table td:last-child{text-align:right}.delete{border:0;background:transparent;color:var(--muted)}.delete:hover{color:var(--danger)}.check{display:flex;gap:11px;align-items:center;padding:12px 0;border-top:1px solid var(--line);font-size:14px}.check input{accent-color:var(--brand);width:17px;height:17px}.check.done span{text-decoration:line-through;color:var(--muted)}.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.album{height:170px;border-radius:14px;padding:15px;display:flex;align-items:end;background:linear-gradient(135deg,#acc99a,#e5c493);color:#fff;font-weight:700;text-shadow:0 1px 4px #0005}.album:nth-child(2n){background:linear-gradient(135deg,#859fc0,#dfaaa0)}.album small{display:block;font-weight:400}.modal{border:0;border-radius:16px;width:min(540px,calc(100% - 30px));padding:0;box-shadow:0 20px 70px #0004}.modal::backdrop{background:#15221677}.modal form{padding:23px}.form{display:grid;gap:12px;margin-top:17px}.form label{font-size:13px;font-weight:650;display:grid;gap:6px}.form input,.form textarea{padding:10px;border:1px solid var(--line);border-radius:8px;outline-color:var(--brand)}.form textarea{min-height:80px}.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}.toast{position:fixed;bottom:22px;right:22px;padding:12px 15px;background:var(--ink);color:#fff;border-radius:9px;opacity:0;transform:translateY(8px);transition:.2s}.toast.show{opacity:1;transform:none}.auth{max-width:430px;margin:10vh auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:0 12px 35px #20302012}.auth h1{font-size:25px}.auth .form{margin:20px 0}.empty{padding:38px;text-align:center;color:var(--muted)}@media(max-width:760px){.app{display:block}.side{padding:13px;position:static;border-right:0;border-bottom:1px solid var(--line)}.brand{margin:0 4px 12px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;padding:8px}.side .nav button:nth-child(n+6){display:none}main{padding:25px 17px}.grid,.minis,.cards,.gallery{grid-template-columns:1fr}.top{align-items:flex-start}.table{display:block;overflow:auto}.toolbar{flex-direction:column}}
 </style></head><body><div id="auth"></div><div id="app" class="app hidden"><aside class="side"><div class="brand"><b>⌂</b>Lar em Ordem</div><nav class="nav" id="nav"></nav><p class="sub" id="profile" style="margin:35px 10px 0;font-size:12px"></p></aside><main id="main"></main></div><dialog class="modal" id="modal"><form id="form"><h2 id="form-title"></h2><div class="form" id="fields"></div><div class="actions"><button class="secondary" type="button" onclick="modal.close()">Cancelar</button><button class="primary">Salvar</button></div></form></dialog><div class="toast" id="toast"></div><script>
