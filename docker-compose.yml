@@ -1,0 +1,14 @@
+services:
+  lar-em-ordem:
+    build: .
+    container_name: lar-em-ordem
+    ports:
+      - "3000:3000"
+    volumes:
+      - lar-em-ordem-data:/data
+      - ./index.html:/app/index.html
+      - ./server.js:/app/server.js
+    restart: unless-stopped
+
+volumes:
+  lar-em-ordem-data:
